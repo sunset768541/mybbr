@@ -141,15 +141,14 @@ pre_install(){
     fi
     # Set shadowsocks config password
     echo "Please input password for shadowsocks-python:"
-     shadowsockspwd="w164053616"
+    shadowsockspwd="w164053616"
     echo
     echo "---------------------------"
     echo "password = ${shadowsockspwd}"
     echo "---------------------------"
     echo
     # Set shadowsocks config port
-    while true
-    do
+    
     echo -e "Please input port for shadowsocks-python [1-65535]:"
     shadowsocksport="443"
     expr ${shadowsocksport} + 0 &>/dev/null
@@ -171,7 +170,7 @@ pre_install(){
 
     echo
     echo "Press any key to start...or Press Ctrl+C to cancel"
-    char=`get_char`
+   
     #Install necessary dependencies
     if check_sys packageManager yum; then
         yum install -y unzip openssl-devel gcc swig python python-devel python-setuptools autoconf libtool libevent automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel
