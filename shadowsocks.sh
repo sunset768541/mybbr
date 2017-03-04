@@ -166,7 +166,7 @@ pre_install(){
     else
         echo "Input error, please input correct number"
     fi
-    done
+   
 
     echo
     echo "Press any key to start...or Press Ctrl+C to cancel"
