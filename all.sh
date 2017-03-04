@@ -578,5 +578,5 @@ echo " URL: https://teddysun.com/489.html"
 echo "----------------------------------------"
 
 install_bbr
-
+echo "bbr-ok" > root/bbrok
 reboot
