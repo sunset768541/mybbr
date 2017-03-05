@@ -1,29 +1,16 @@
 #!/usr/bin/env bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
-#=================================================================#
-#   System Required:  CentOS 6+, Debian 7+, Ubuntu 12+            #
-#   Description: One click Install Shadowsocks-Python server      #
-#   Author: Teddysun <i@teddysun.com>                             #
-#   Thanks: @clowwindy <https://twitter.com/clowwindy>            #
-#   Intro:  https://teddysun.com/342.html                         #
-#=================================================================#
 
 clear
-echo
-echo "#############################################################"
-echo "# One click Install Shadowsocks-Python server               #"
-echo "# Intro: https://teddysun.com/342.html                      #"
-echo "# Author: Teddysun <i@teddysun.com>                         #"
-echo "# Github: https://github.com/shadowsocks/shadowsocks        #"
-echo "#############################################################"
-echo
-
 #Current folder
 cur_dir=`pwd`
 
 # Make sure only root can run our script
 rootness(){
+echo "***************************************************"
+echo " *                 rootness()                      *"
+echo "***************************************************"
     if [[ $EUID -ne 0 ]]; then
         echo "Error:This script must be run as root!" 1>&2
         exit 1
@@ -32,6 +19,9 @@ rootness(){
 
 # Disable selinux
 disable_selinux(){
+echo "***************************************************"
+echo "*                 disable_selinux()               *"
+echo "***************************************************"
     if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
         sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
         setenforce 0
@@ -40,6 +30,9 @@ disable_selinux(){
 
 #Check system
 check_sys(){
+echo "***************************************************"
+echo "*                 check_sys()                     *"
+echo "***************************************************"
     local checkType=$1
     local value=$2
 
@@ -86,6 +79,9 @@ check_sys(){
 
 # Get version
 getversion(){
+echo "***************************************************"
+echo "*                getversion()                     *"
+echo "***************************************************"
     if [[ -s /etc/redhat-release ]]; then
         grep -oE  "[0-9.]+" /etc/redhat-release
     else
@@ -95,6 +91,9 @@ getversion(){
 
 # CentOS version
 centosversion(){
+echo "***************************************************"
+echo "*                centosversion()                  *"
+echo "***************************************************"
     if check_sys sysRelease centos; then
         local code=$1
         local version="$(getversion)"
@@ -111,6 +110,9 @@ centosversion(){
 
 # Get public IP address
 get_ip(){
+echo "***************************************************"
+echo "*                get_ip()                         *"
+echo "***************************************************"
     local IP=$( ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1 )
     [ -z ${IP} ] && IP=$( wget -qO- -t1 -T2 ipv4.icanhazip.com )
     [ -z ${IP} ] && IP=$( wget -qO- -t1 -T2 ipinfo.io/ip )
@@ -118,6 +120,7 @@ get_ip(){
 }
 
 get_char(){
+
     SAVEDSTTY=`stty -g`
     stty -echo
     stty cbreak
@@ -129,6 +132,9 @@ get_char(){
 
 # Pre-installation settings
 pre_install(){
+echo "***************************************************"
+echo "*                pre_install()                    *"
+echo "***************************************************"
     if check_sys packageManager yum || check_sys packageManager apt; then
         # Not support CentOS 5
         if centosversion 5; then
@@ -182,6 +188,9 @@ pre_install(){
 
 # Download files
 download_files(){
+echo "***************************************************"
+echo "*                download_files()                 *"
+echo "***************************************************"
     # Download libsodium file
     if ! wget --no-check-certificate -O libsodium-1.0.11.tar.gz https://github.com/jedisct1/libsodium/releases/download/1.0.11/libsodium-1.0.11.tar.gz; then
         echo "Failed to download libsodium-1.0.11.tar.gz!"
@@ -208,6 +217,9 @@ download_files(){
 
 # Config shadowsocks
 config_shadowsocks(){
+echo "***************************************************"
+echo "*                config_shadowsocks()             *"
+echo "***************************************************"
     cat > /etc/shadowsocks.json<<-EOF
 {
     "server":"0.0.0.0",
@@ -224,6 +236,9 @@ EOF
 
 # Firewall set
 firewall_set(){
+echo "***************************************************"
+echo "*               firewall_set()                    *"
+echo "***************************************************"
     echo "firewall set start..."
     if centosversion 6; then
         /etc/init.d/iptables status > /dev/null 2>&1
@@ -263,6 +278,9 @@ firewall_set(){
 
 # Install Shadowsocks
 install(){
+echo "***************************************************"
+echo "*              install()                          *"
+echo "***************************************************"
     # Install libsodium
     tar zxf libsodium-1.0.11.tar.gz
     cd libsodium-1.0.11
@@ -319,6 +337,9 @@ install(){
 
 # Install cleanup
 install_cleanup(){
+echo "***************************************************"
+echo "*              install_cleanup()                  *"
+echo "***************************************************"
     cd ${cur_dir}
     rm -rf shadowsocks-master.zip shadowsocks-master libsodium-1.0.11.tar.gz libsodium-1.0.11
 }
@@ -357,6 +378,9 @@ uninstall_shadowsocks(){
 
 # Install Shadowsocks-python
 install_shadowsocks(){
+echo "***************************************************"
+echo "*              install_shadowsocks()               *"
+echo "***************************************************"
     rootness
     disable_selinux
     pre_install
@@ -370,6 +394,7 @@ install_shadowsocks(){
 }
 
 # Initialization step
+start_instal_time=$(date +%s)
 action=$1
 [ -z $1 ] && action=install
 case "$action" in
@@ -410,7 +435,9 @@ elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
 fi
 
 get_latest_version() {
-
+echo "***************************************************"
+echo "*              get_latest_version()              *"
+echo "***************************************************"
     latest_version=$(wget -qO- http://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]./{print $2}' | cut -d/ -f1 | grep -v -  | sort -V | tail -1)
 
     [ -z ${latest_version} ] && return 1
@@ -473,6 +500,9 @@ centosversion() {
 }
 
 check_bbr_status() {
+echo "***************************************************"
+echo "*              check_bbr_status()                *"
+echo "***************************************************"
     local param=$(sysctl net.ipv4.tcp_available_congestion_control | awk '{print $3}')
     if uname -r | grep -Eqi "4.10."; then
         if [[ "${param}" == "bbr" ]]; then
@@ -486,7 +516,9 @@ check_bbr_status() {
 }
 
 install_elrepo() {
-
+echo "***************************************************"
+echo "*             install_elrepo()                    *"
+echo "***************************************************"
     if centosversion 5; then
         echo -e "${red}Error:${plain} not supported CentOS 5."
         exit 1
@@ -507,6 +539,9 @@ install_elrepo() {
 }
 
 install_config() {
+echo "***************************************************"
+echo "*             install_config()                    *"
+echo "***************************************************"
     if [[ "${release}" == "centos" ]]; then
         if centosversion 6; then
             if [ ! -f "/boot/grub/grub.conf" ]; then
@@ -533,6 +568,9 @@ install_config() {
 }
 
 install_bbr() {
+echo "***************************************************"
+echo "*             install_bbr()                       *"
+echo "***************************************************"
     check_bbr_status
     if [ $? -eq 0 ]; then
         echo
@@ -566,17 +604,11 @@ install_bbr() {
     install_config
 }
 
-clear
-echo "---------- System Information ----------"
-echo " OS      : $opsy"
-echo " Arch    : $arch ($lbit Bit)"
-echo " Kernel  : $kern"
-echo "----------------------------------------"
 echo " Auto install latest kernel for TCP BBR"
-echo
-echo " URL: https://teddysun.com/489.html"
-echo "----------------------------------------"
 
 install_bbr
-echo "bbr-ok" > root/bbrok
+end_install_time=$(date +%s)
+echo "install cost time"
+echo $(( end_install_time-start_install_time ))
+cp /tmp/firstboot.log  /root
 reboot
