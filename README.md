@@ -6,4 +6,4 @@ if(i<0)
 i++;
 }
 ```
-<i class="icon-refresh"></i>
+ ![alt text](https://raw.githubusercontent.com/juxuechen/ShareKit/cut-for-baby/share.jpg)
